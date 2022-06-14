@@ -1,0 +1,326 @@
+---
+title: "Inflación en América del Sur"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+#Importar librerías
+library(flexdashboard)
+library(tidyverse)
+library(highcharter)
+library(viridis)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+library(plotly)
+library(kableExtra)
+library(gt)
+library(htmltools)
+```
+
+
+```{r}
+#Importar bases de datos
+americadelsur1 <- read_excel("americadelsur.xlsx", 
+    sheet = "americadelsur")
+americadelsur1 <-americadelsur1[-10,]
+americadelsur <- read_excel("americadelsur.xlsx", 
+    sheet = "americadelsur2")
+```
+
+Año 2021
+======================================================================
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Mapa inflación en América del Sur 2021
+• Inflación reportada por el Banco Mundial, el año 2021.\
+• Se expresa cifra en valor porcentual.
+```{r}
+Mapa <- americadelsur1  %>%
+  plot_geo(locationmode = 'ISO-3') %>%
+  add_trace(z = ~`2021`, locations = ~`Country Code`)  %>%
+  layout(geo = list(scope = 'south america'), 
+         width = 550, height = 500) %>%
+  colorbar(title = "Inflación en 
+América del Sur
+2021", colour = "#FFFFFF")
+Mapa
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Gráfico inflación en América del Sur 2021
+• Países de Argentina y Venezuela no reportan sus valores en la base del Banco Mundial.\
+• Suriname se excluye de la muestra por tener un valor excesivamente alto (59,11%), lo que dificulta la visualización.
+```{r}
+País<-(c("Bolivia", "Brasil", "Chile", "Colombia","Ecuador","Guyana","Perú", "Paraguay","Uruguay"))
+Inflación<-(c(0.74,8.30,4.52,3.50,0.13,5.03,4.27,4.79,7.75))
+
+inflacion2021<-data.frame(País,Inflación)
+```
+
+```{r}
+custom_colors <- viridis::plasma(n = 9)
+
+inflacion2021%>%   hchart(type="bar", hcaes(x = País, y = Inflación,color = custom_colors)) %>%   hc_add_theme(hc_theme_google()) %>% 
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>%   hc_yAxis(title = list(text = "Inflación (expresada en %)"), max=9) %>%
+  hc_title(text = 'Inflación en América del Sur en 2021',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_subtitle(text = 'Por país',
+              style = list(fontSize = '16px')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+
+Evolución en los últimos 25 años
+======================================================================
+
+Column {.tabset .tabset-fade data-width=500}
+-----------------------------------------------------------------------
+
+### Sudámerica (promedio)
+```{r}
+custom_colors <- viridis::plasma(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=TOTAL, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=30) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en América del Sur',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_subtitle(text = 'Inflación en promedio',
+              style = list(fontSize = '16px')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+
+### Bolivia
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Bolivia, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=25) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Bolivia',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Brasil
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Brasil, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=20) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Brasil',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Chile
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Chile, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=10) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Chile',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Colombia
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Colombia, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=25) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Colombia',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Ecuador
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Ecuador, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=95) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Ecuador',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Guyana
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Guyana, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=15) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Guyana',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Perú
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Perú, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=15) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Perú',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Paraguay
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Paraguay, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=15) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Paraguay',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Suriname
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Suriname, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=120) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Suriname',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Trinidad y Tobago
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=`Trinidad y Tobago`, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=15) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Trinidad y Tobago',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+### Uruguay
+```{r}
+custom_colors <- viridis::viridis(n = 32)
+
+americadelsur %>% 
+  hchart(type="line", hcaes(x= as.double(Year), y=Uruguay, color = custom_colors)) %>% 
+  hc_colors(c("gray")) %>%
+  hc_add_theme(hc_theme_google()) %>% 
+  hc_xAxis(title = list(text = "Año"),min=1996, plotLines = list(list(label = list(text = "Crisis 2008"), color = "red", width = 2, value = 2008))) %>%
+   hc_yAxis(title = list(text = "Inflación (expresada en %)"),max=30) %>%
+  hc_tooltip(pointFormat = '<b>Inflación: </b> {point.y}% <br>') %>% 
+  hc_title(text = 'Trayectoria inflacionaria en Uruguay',
+           style = list(fontSize = '25px', fontWeight = 'bold')) %>% 
+  hc_credits(enabled = TRUE, text = '"Elaboración propia a partir de datos del Banco Mundial"')
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### {.no-padding data-height=400}
+
+
+
+
+### {.no-padding data-height=400}
+
+```{r}
+timeline_tab <- tibble( 
+ Acontecimiento = c( "Crisis Asiatica", ""), 
+ Origen = c( 
+   "Inició en 1997 con la devaluación de la moneda tailandesa y se expandió rápidamente por todo el continente asiatico. Algunas de las causas son la desmedida demanda del crédito exterior, la escasa supervisión bancaria, la sobrevaloración de la moneda, la gran inestabilidad de los 
+   mercados financieros internacionales.",
+   ""), 
+Consecuencias = c( 
+   "El desplome de los mercados bursátiles, el alza brusca de las tasas de interés y el  debilitamiento de las monedas de la región, el deterioro de los términos de intercambio con el exterior y la contracción del comercio internacional, y la interrupción de los flujos privados de capital.",
+   "")
+   ) %>%
+add_row(Acontecimiento = c( 
+                  "Crisis Subprime", 
+                  ""), 
+  Origen = c(
+    
+    "La crisis comenzó a desatarse el año 2007 debido, principalmente, al alza progresiva de las tasas de interés por parte de la reserva federal, así como la baja en el valor de las viviendas adquiridas.",
+    ""), 
+  Consecuencias = c( 
+   "La crisis subprime frenó el crecimiento en América Latina, precarizó las condiciones laborales y aumentó los índices de pobreza regional.",
+   "") 
+) %>% 
+  add_row(Acontecimiento = c( 
+                 "Crisis de Venezuela"), 
+    Origen  = c( 
+                 "Exagerado crecimiento de la deuda externa, sin control, entre 2007-2012." 
+                 ), 
+    Consecuencias  = c( 
+            "Reconversión monetaria del bolivar, ajustes del salario menor al aumento de la inflación, aumento de la migración de la población, aumento del desempleo, pérdida de reservas internacionales, y hubo un aumento de la incertidumbre." 
+            ))
+```
+
+```{r}
+div(style = 'height:300px; overflow-y:scroll', gt(timeline_tab) %>% 
+      tab_header(title = md('Acontecimientos históricos importantes que impactaron a América del Sur'),
+                 subtitle = md('Elaborada a partir de investigación propia')) %>% 
+      opt_table_font(font = list(google_font('Chivo'), default_fonts())) %>% 
+      tab_style(location = cells_column_labels(columns = everything()),
+                style = list(cell_borders(sides = 'bottom', 
+                                          weight = px(2)), 
+                             cell_text(weight = 'bold'))) %>% 
+      tab_options(table.font.size = px(14L),
+                  table.border.top.style = 'none',
+                  column_labels.border.bottom.width = 2,
+                  table_body.border.top.style = 'none',
+                  data_row.padding = px(3))
+    )
+```
